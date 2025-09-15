@@ -24,7 +24,11 @@ locals {
 
   phase2 = flatten([
     for vdom in var.vdoms : [
-      for name, parts in try(local.vdom_ipsec_yaml[vdom], {}) : [ merge(parts.phase2, { vdom = vdom, name = name }) ]
+      for name, parts in try(local.vdom_ipsec_yaml[vdom], {}) : [
+        for phase2, settings in try(parts.phase2, {}) : [
+          merge(settings, { vdom = vdom, name = "${phase2}", phase1name = name })
+        ]
+      ]
     ]
   ])
 }
@@ -136,7 +140,7 @@ resource fortios_vpnipsec_phase2interface phase2 {
   for_each                  = { for phase2 in local.phase2 : phase2.name => phase2}
   depends_on                = [ fortios_vpnipsec_phase1interface.phase1 ]
   name                      = each.value.name
-  phase1name                = each.value.name
+  phase1name                = each.value.phase1name
   proposal                  = each.value.proposal
   vdomparam                 = each.value.vdom
 
