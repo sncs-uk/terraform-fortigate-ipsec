@@ -4,9 +4,11 @@
  * This terraform module configures Policy Objects on a firewall
  */
 terraform {
+  required_version = ">= 1.13.0"
   required_providers {
     fortios = {
       source  = "fortinetdev/fortios"
+      version = ">= 1.22.0"
     }
   }
 }
@@ -18,7 +20,7 @@ locals {
 
   phase1 = flatten([
     for vdom in var.vdoms : [
-      for name, parts in try(local.vdom_ipsec_yaml[vdom], {}) : [ merge(parts.phase1, { vdom = vdom, name = name }) ]
+      for name, parts in try(local.vdom_ipsec_yaml[vdom], {}) : [merge(parts.phase1, { vdom = vdom, name = name })]
     ]
   ])
 
@@ -33,13 +35,13 @@ locals {
   ])
 }
 
-resource fortios_vpnipsec_phase1interface phase1 {
-  for_each                  = { for phase1 in local.phase1 : phase1.name => phase1}
-  name                      = each.value.name
-  interface                 = each.value.interface
-  proposal                  = each.value.proposal
-  remote_gw                 = each.value.remote_gw
-  vdomparam                 = each.value.vdom
+resource "fortios_vpnipsec_phase1interface" "phase1" {
+  for_each  = { for phase1 in local.phase1 : phase1.name => phase1 }
+  name      = each.value.name
+  interface = each.value.interface
+  proposal  = each.value.proposal
+  remote_gw = each.value.remote_gw
+  vdomparam = each.value.vdom
 
   acct_verify               = try(each.value.acct_verify, null)
   add_gw_route              = try(each.value.add_gw_route, null)
@@ -136,37 +138,37 @@ resource fortios_vpnipsec_phase1interface phase1 {
   xauthtype                 = try(each.value.xauthtype, null)
 }
 
-resource fortios_vpnipsec_phase2interface phase2 {
-  for_each                  = { for phase2 in local.phase2 : phase2.name => phase2}
-  depends_on                = [ fortios_vpnipsec_phase1interface.phase1 ]
-  name                      = each.value.name
-  phase1name                = each.value.phase1name
-  proposal                  = each.value.proposal
-  vdomparam                 = each.value.vdom
+resource "fortios_vpnipsec_phase2interface" "phase2" {
+  for_each   = { for phase2 in local.phase2 : phase2.name => phase2 }
+  depends_on = [fortios_vpnipsec_phase1interface.phase1]
+  name       = each.value.name
+  phase1name = each.value.phase1name
+  proposal   = each.value.proposal
+  vdomparam  = each.value.vdom
 
-  add_route                 = try(each.value.add_route, null)
-  auto_discovery_forwarder  = try(each.value.auto_discovery_forwarder, null)
-  auto_discovery_sender     = try(each.value.auto_discovery_sender, null)
-  auto_negotiate            = try(each.value.auto_negotiate, null)
-  dhcp_ipsec                = try(each.value.dhcp_ipsec, null)
-  dhgrp                     = try(each.value.dhgrp, null)
-  dst_addr_type             = try(each.value.dst_addr_type, null)
-  dst_end_ip6               = try(each.value.dst_end_ip6, null)
-  dst_port                  = try(each.value.dst_port, null)
-  dst_subnet                = try(each.value.dst_subnet, null)
-  encapsulation             = try(each.value.encapsulation, null)
-  keepalive                 = try(each.value.keepalive, null)
-  keylife_type              = try(each.value.keylife_type, null)
-  keylifekbs                = try(each.value.keylifekbs, null)
-  keylifeseconds            = try(each.value.keylifeseconds, null)
-  l2tp                      = try(each.value.l2tp, null)
-  pfs                       = try(each.value.pfs, null)
-  protocol                  = try(each.value.protocol, null)
-  replay                    = try(each.value.replay, null)
-  route_overlap             = try(each.value.route_overlap, null)
-  single_source             = try(each.value.single_source, null)
-  src_addr_type             = try(each.value.src_addr_type, null)
-  src_end_ip6               = try(each.value.src_end_ip6, null)
-  src_port                  = try(each.value.src_port, null)
-  src_subnet                = try(each.value.src_subnet, null)
+  add_route                = try(each.value.add_route, null)
+  auto_discovery_forwarder = try(each.value.auto_discovery_forwarder, null)
+  auto_discovery_sender    = try(each.value.auto_discovery_sender, null)
+  auto_negotiate           = try(each.value.auto_negotiate, null)
+  dhcp_ipsec               = try(each.value.dhcp_ipsec, null)
+  dhgrp                    = try(each.value.dhgrp, null)
+  dst_addr_type            = try(each.value.dst_addr_type, null)
+  dst_end_ip6              = try(each.value.dst_end_ip6, null)
+  dst_port                 = try(each.value.dst_port, null)
+  dst_subnet               = try(each.value.dst_subnet, null)
+  encapsulation            = try(each.value.encapsulation, null)
+  keepalive                = try(each.value.keepalive, null)
+  keylife_type             = try(each.value.keylife_type, null)
+  keylifekbs               = try(each.value.keylifekbs, null)
+  keylifeseconds           = try(each.value.keylifeseconds, null)
+  l2tp                     = try(each.value.l2tp, null)
+  pfs                      = try(each.value.pfs, null)
+  protocol                 = try(each.value.protocol, null)
+  replay                   = try(each.value.replay, null)
+  route_overlap            = try(each.value.route_overlap, null)
+  single_source            = try(each.value.single_source, null)
+  src_addr_type            = try(each.value.src_addr_type, null)
+  src_end_ip6              = try(each.value.src_end_ip6, null)
+  src_port                 = try(each.value.src_port, null)
+  src_subnet               = try(each.value.src_subnet, null)
 }
