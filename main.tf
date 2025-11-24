@@ -28,7 +28,7 @@ locals {
     for vdom in var.vdoms : [
       for name, parts in try(local.vdom_ipsec_yaml[vdom], {}) : [
         for phase2, settings in try(parts.phase2, {}) : [
-          merge(settings, { vdom = vdom, name = "${phase2}", phase1name = name })
+          merge(settings, { vdom = vdom, name = phase2, phase1name = name })
         ]
       ]
     ]
