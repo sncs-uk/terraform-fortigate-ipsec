@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Fortigate Policy Objects configuration module
+# Fortigate IPsec configuration
 
-This terraform module configures Policy Objects on a firewall
+This terraform module configures IPsec tunnels on a FortiGate firewall
 
 ## Requirements
 
